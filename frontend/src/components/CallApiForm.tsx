@@ -5,18 +5,18 @@ import { initializeApp } from "firebase/app";
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA2RD_lOjnMtQgR19jRicHWuz0_GH1rEtA",
-    authDomain: "verify-influencers.firebaseapp.com",
-    projectId: "verify-influencers",
-    storageBucket: "verify-influencers.firebasestorage.app",
-    messagingSenderId: "513117636487",
-    appId: "1:513117636487:web:ea9dedf82c3878ab907522"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 initializeApp(firebaseConfig);
 const functions = getFunctions();
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.REACT_APP_NODE_ENV === "development") {
     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
 
