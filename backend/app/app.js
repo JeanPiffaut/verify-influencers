@@ -1,16 +1,14 @@
 const express = require('express');
-const { errorMiddleware } = require('../shared/middlewares/errorMiddleware');
+const { onRequest } = require('firebase-functions/v2/https');
 const influencerRoutes = require('../modules/influencers/adapters/influencerRoutes');
-const claimRoutes = require('../modules/claims/adapters/claimRoutes');
+const {errorMiddleware} = require("../modules/shared/middlewares/errorMiddleware");
 
 const app = express();
 app.use(express.json());
 
 // Rutas principales
 app.use('/api/influencers', influencerRoutes);
-app.use('/api/claims', claimRoutes);
 
 // Middleware de errores
 app.use(errorMiddleware);
-
-module.exports = app;
+exports.api = onRequest(app);
