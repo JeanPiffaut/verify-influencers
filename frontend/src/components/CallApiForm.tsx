@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import { httpsCallable } from "firebase/functions";
+import {connectFunctionsEmulator, httpsCallable} from "firebase/functions";
 import { getFunctions } from "firebase/functions";
 import { initializeApp } from "firebase/app";
 
@@ -15,6 +15,10 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 const functions = getFunctions();
+
+if (process.env.NODE_ENV === "development") {
+    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+}
 
 const CallApiForm: React.FC = () => {
     const [input, setInput] = useState<string>("");
