@@ -16,7 +16,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 const functions = getFunctions();
 
-if (process.env.REACT_APP_NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development") {
     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
 
