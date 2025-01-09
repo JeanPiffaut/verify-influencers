@@ -1,9 +1,10 @@
 const { onMessagePublished } = require('firebase-functions/v2/pubsub');
 const { updateStatus } = require('../../repository/contentRepository');
+const {decodePubSubMessage} = require("../../../shared/utils/pubsub");
 
 exports.completeContentProcess = onMessagePublished('complete-content-process', async (event) => {
     try {
-        const data = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString('utf-8'));
+        const data = decodePubSubMessage(event);
         const { influencerId } = data;
 
         console.log(`Content process completed for influencer ${influencerId}`);

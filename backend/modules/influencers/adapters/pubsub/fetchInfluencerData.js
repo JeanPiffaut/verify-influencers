@@ -1,12 +1,12 @@
 const { onMessagePublished } = require('firebase-functions/v2/pubsub');
 const { fetchInfluencerData } = require('../../services/influencerService');
-const { publishMessage } = require('../../../shared/utils/pubsub');
+const { publishMessage, decodePubSubMessage} = require('../../../shared/utils/pubsub');
 
 // Función Pub/Sub para manejar la extracción de datos del influencer
 exports.fetchInfluencerDataHandler = onMessagePublished('fetch-influencer-data', async (event) => {
     try {
         // Decodificar el mensaje del evento Pub/Sub
-        const data = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString('utf-8'));
+        const data = decodePubSubMessage(event);
         const { influencerId } = data;
 
         // Lógica de negocio: obtener datos del influencer

@@ -13,3 +13,13 @@ exports.publishMessage = async (topicName, data) => {
         throw error;
     }
 };
+
+exports.decodePubSubMessage = (event) => {
+    try {
+        const rawData = event.data.message.data;
+        return JSON.parse(Buffer.from(rawData, 'base64').toString('utf-8'));
+    } catch (error) {
+        console.error('Error decoding Pub/Sub message:', error.message);
+        throw new Error('Invalid Pub/Sub message format.');
+    }
+};

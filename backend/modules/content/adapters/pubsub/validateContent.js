@@ -1,10 +1,10 @@
 const {onMessagePublished} = require('firebase-functions/v2/pubsub');
-const {publishMessage} = require('../../../shared/utils/pubsub');
+const {publishMessage, decodePubSubMessage} = require('../../../shared/utils/pubsub');
 const {validateContent} = require("../../service/contentValidationService");
 
 exports.validateContent = onMessagePublished('validate-content', async (event) => {
     try {
-        const data = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString('utf-8'));
+        const data = decodePubSubMessage(event);
         const {influencerId} = data;
 
         const validContent = await validateContent(influencerId);
