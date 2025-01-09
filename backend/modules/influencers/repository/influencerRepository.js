@@ -5,11 +5,10 @@ const db = getFirestore();
 
 exports.getInfluencerById = async (id) => {
     const doc = await db.collection('influencers').doc(id).get();
-    if (!doc.exists) {
-        return null;
-    }
+    if (!doc.exists) return null;
+
     const data = doc.data();
-    return new Influencer(id, data.name, data.lastSearchDate, data.score, data.data);
+    return new Influencer(id, data.name, data.lastSearchDate, data.status, data.score, data.data);
 };
 
 exports.saveInfluencer = async (influencer) => {
@@ -28,4 +27,19 @@ exports.updateLastSearchDate = async (id) => {
 
 exports.updateScore = async (id, score) => {
     await db.collection('influencers').doc(id).update({ score });
+};
+
+exports.createInfluencer = async (id, name) => {
+    const influencer = new Influencer(id, name, null, 'new');
+    await db.collection('influencers').doc(id).set({
+        name: influencer.name,
+        lastSearchDate: influencer.lastSearchDate,
+        status: influencer.status,
+        data: influencer.data,
+    });
+    return influencer;
+};
+
+exports.updateInfluencerStatus = async (id, status) => {
+    await db.collection('influencers').doc(id).update({ status });
 };

@@ -1,19 +1,19 @@
 class Influencer {
-    constructor(id, name, lastSearchDate, score, data) {
+    constructor(id, name, lastSearchDate, status, score, data) {
         this.id = id;
         this.name = name;
-        this.lastSearchDate = lastSearchDate;
+        this.lastSearchDate = lastSearchDate || null; // Fecha de última actualización
+        this.status = status || 'new'; // Estados posibles: new, updating, done
         this.score = score;
-        this.data = data; // Datos adicionales sobre el influencer
+        this.data = data || {}; // Información adicional del influencer
     }
 
+    // Verificar si el perfil necesita actualización
     needsUpdate() {
-        const today = new Date();
-        return this.lastSearchDate !== today;
-    }
+        if (this.status !== 'done') return false;
 
-    updateScore(newScore) {
-        this.score = newScore;
+        const today = new Date().toISOString().split('T')[0];
+        return this.lastSearchDate !== today;
     }
 }
 

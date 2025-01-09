@@ -1,23 +1,20 @@
-const { checkLastSearch } = require('../../services/influencerService');
-const {getInfluencerById} = require("../../repository/influencerRepository");
-const {publishMessage} = require("../../../shared/utils/pubsub");
-const {HttpsError} = require("firebase-functions/v2/https");
+const { handleInfluencerLogic } = require('../../services/influencerService');
+const { HttpsError } = require('firebase-functions/v2/https');
 
 exports.handleInfluencerRequest = async (data) => {
     try {
-        const { id } = data.data.payload;
-        const needsUpdate = await checkLastSearch(id);
+        const { id, name } = data.data.payload;
 
-        if (needsUpdate) {
-            await publishMessage('fetch-influencer-data', {id});
+        if (!id || !name) {
+            throw new HttpsError('invalid-argument', 'Influencer ID and name are required.');
         }
 
-        return await getInfluencerById(id);
+        console.log(`Received request for influencer: ${name} (${id})`);
+
+        const result = await handleInfluencerLogic(id, name);
+        return result;
     } catch (error) {
         console.error('Error handling influencer request:', error.message);
-        throw new HttpsError(
-            'invalid-argument',
-            `Unsupported action`
-        );
+        throw new HttpsError(error.code || 'internal', error.message || 'Internal server error.');
     }
 };
