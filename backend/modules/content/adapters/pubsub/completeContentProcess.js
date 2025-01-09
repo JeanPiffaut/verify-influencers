@@ -1,5 +1,5 @@
 const { onMessagePublished } = require('firebase-functions/v2/pubsub');
-const { updateStatus } = require('../../repository/contentRepository');
+const { updateContentMetadata } = require('../../repository/contentRepository');
 const {decodePubSubMessage} = require("../../../shared/utils/pubsub");
 
 exports.completeContentProcess = onMessagePublished('complete-content-process', async (event) => {
@@ -8,7 +8,7 @@ exports.completeContentProcess = onMessagePublished('complete-content-process', 
         const { influencerId } = data;
 
         console.log(`Content process completed for influencer ${influencerId}`);
-        await updateStatus(influencerId, 'Content validated');
+        await updateContentMetadata(influencerId, 'Content validated');
     } catch (error) {
         console.error('Error completing content process:', error.message);
     }

@@ -10,7 +10,7 @@ exports.scoreInfluencer = onMessagePublished('score-influencer', async (event) =
         const score = await calculateAndSaveScore(influencerId);
         console.log(`Score for influencer ${influencerId}: ${score}`);
 
-        await publishMessage('complete-process', { influencerId });
+        await publishMessage('complete-content-process', { influencerId });
     } catch (error) {
         console.error('Error scoring influencer:', error.message);
     }

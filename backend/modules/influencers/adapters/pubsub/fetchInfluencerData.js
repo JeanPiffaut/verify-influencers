@@ -14,7 +14,7 @@ exports.fetchInfluencerDataHandler = onMessagePublished('fetch-influencer-data',
         console.log(`Fetched data for influencer ${influencerId}:`, influencerData);
 
         // Publicar el siguiente paso del flujo
-        await publishMessage('validate-influencer', { influencerId });
+        await publishMessage('validate-content', { influencerId });
     } catch (error) {
         console.error('Error fetching influencer data:', error.message);
         throw new Error(`Error fetching influencer data: ${error.message}`);

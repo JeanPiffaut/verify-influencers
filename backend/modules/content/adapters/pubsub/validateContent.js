@@ -10,7 +10,7 @@ exports.validateContent = onMessagePublished('validate-content', async (event) =
         const validContent = await validateContent(influencerId);
         console.log(`Valid content for influencer ${influencerId}:`, validContent);
 
-        await publishMessage('complete-content-process', {influencerId});
+        await publishMessage('score-influencer', {influencerId});
     } catch (error) {
         console.error('Error validating content:', error.message);
     }
