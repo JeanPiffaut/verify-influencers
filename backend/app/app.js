@@ -4,16 +4,8 @@ const { HttpsError } = require('firebase-functions/v2/https');
 
 exports.handleInfluencerRequest = async (data, context) => {
     try {
-        // Verifica autenticación si es requerida
-        if (!context.auth) {
-            throw new HttpsError(
-                'unauthenticated',
-                'Authentication is required to access this function.'
-            );
-        }
-
         // Procesar las solicitudes según el tipo de acción
-        const { action, payload } = data;
+        const { action, payload } = data.data;
 
         switch (action) {
             case 'start':
