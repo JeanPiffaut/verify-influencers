@@ -1,4 +1,5 @@
 const twitterClient = require('./twitterClient');
+const Content = require("../../content/domain/content");
 
 /**
  * Obtiene los tweets de un usuario en un rango de fechas.
@@ -15,34 +16,42 @@ exports.getTweets = async (username, startDate, endDate) => {
 
         // Parámetros para la búsqueda de tweets
         const params = {
+            max_results: 100,
+            'tweet.fields': 'created_at,public_metrics',
             'start_time': new Date(startDate).toISOString(),
             'end_time': new Date(endDate).toISOString(),
-            'max_results': 100, // Máximo permitido por la API en una sola solicitud
-            'tweet.fields': 'created_at,public_metrics',
         };
 
-        // Realiza la solicitud para obtener los tweets del usuario en el rango de fechas
-        const tweets = [];
-        let hasNextPage = true;
-        let nextToken = null;
+        // Realiza la solicitud para obtener los tweets del usuario
+        const response = await twitterClient.v2.userTimeline(userId, params);
 
-        while (hasNextPage) {
-            const response = await twitterClient.v2.userTimeline(userId, {
-                ...params,
-                pagination_token: nextToken,
+        // Verifica si la propiedad 'data' existe y es un arreglo
+        if (Array.isArray(response.data)) {
+            // Mapear los tweets a instancias del modelo Content
+            const contents = response.data.map((tweet) => {
+                const metadata = {
+                    retweets: tweet.public_metrics.retweet_count,
+                    likes: tweet.public_metrics.like_count,
+                    replies: tweet.public_metrics.reply_count,
+                    quotes: tweet.public_metrics.quote_count,
+                };
+
+                return new Content(null, null, 'tweet', tweet.text, metadata, tweet.created_at);
             });
 
-            if (response.data) {
-                tweets.push(...response.data);
-            }
-
-            nextToken = response.meta.next_token;
-            hasNextPage = !!nextToken;
+            // Filtrar contenido no válido según el modelo
+            return contents.filter((content) => content.isValid());
+        } else {
+            console.warn(`No tweets found for user: ${username}`);
+            return [];
         }
-
-        return tweets;
     } catch (error) {
-        console.error('Error fetching tweets:', error);
+        if (error.code === 429 && error.rateLimit) {
+            const resetTimeout = error.rateLimit.reset * 1000; // Convertir a milisegundos
+            const timeToWait = resetTimeout - Date.now();
+            console.warn(`Rate limit reached. Retrying after ${Math.ceil(timeToWait / 1000)} seconds...`);
+        }
+        //console.error('Error fetching tweets:', error);
         throw new Error('Failed to fetch tweets from Twitter API.');
     }
 };

@@ -10,11 +10,16 @@ exports.fetchInfluencerDataHandler = onMessagePublished('fetch-influencer-data',
         console.log(`Fetching data for influencer ${influencerId} within period`, period);
 
         // Obtener datos del influencer y contenido desde la API de Twitter
-        await fetchInfluencerData(influencerId, period);
+        const influencerData = await fetchInfluencerData(influencerId, period);
 
         console.log(`Fetched data for influencer ${influencerId}. Saving content...`);
 
         // Publicar el siguiente paso en el flujo
+        if (influencerData.tweets.length === 0) {
+            await publishMessage('complete-content-process', { influencerId });
+            return;
+        }
+
         await publishMessage('validate-content', { influencerId });
 
         console.log(`Content saved and validation process initiated for ${influencerId}.`);
