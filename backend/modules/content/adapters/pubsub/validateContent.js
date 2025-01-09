@@ -4,13 +4,12 @@ const {validateContent} = require("../../service/contentValidationService");
 
 exports.validateContent = onMessagePublished('validate-content', async (event) => {
     try {
-        const data = decodePubSubMessage(event);
-        const {influencerId} = data;
+        const {id} = decodePubSubMessage(event);
 
-        const validContent = await validateContent(influencerId);
-        console.log(`Valid content for influencer ${influencerId}:`, validContent);
+        const validContent = await validateContent(id);
+        console.log(`Valid content for influencer ${id}:`, validContent);
 
-        await publishMessage('score-influencer', {influencerId});
+        await publishMessage('score-influencer', {id});
     } catch (error) {
         console.error('Error validating content:', error.message);
     }

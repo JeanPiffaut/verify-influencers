@@ -6,7 +6,7 @@ exports.validateContent = async (influencerId) => {
     const validContent = contentList.filter((content) => content.isValid());
 
     if (validContent.length === 0) {
-        throw new Error(`No valid content found for influencer ${influencerId}.`);
+        //throw new Error(`No valid content found for influencer ${influencerId}.`);
     }
 
     return validContent;

@@ -12,7 +12,7 @@ exports.checkLastSearch = async (id) => {
 exports.fetchInfluencerData = async (id) => {
     // Aquí se simula una llamada a una API externa para obtener datos del influencer
     const dataFromAPI = {
-        id,
+        id: id,
         name: 'John Doe',
         data: { followers: 10000, tweets: 500 },
     };

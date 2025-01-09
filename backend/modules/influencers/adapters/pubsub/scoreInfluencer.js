@@ -4,13 +4,12 @@ const { publishMessage, decodePubSubMessage} = require('../../../shared/utils/pu
 
 exports.scoreInfluencer = onMessagePublished('score-influencer', async (event) => {
     try {
-        const data = decodePubSubMessage(event);
-        const { influencerId } = data;
+        const {id} = decodePubSubMessage(event);
 
-        const score = await calculateAndSaveScore(influencerId);
-        console.log(`Score for influencer ${influencerId}: ${score}`);
+        const score = await calculateAndSaveScore(id);
+        console.log(`Score for influencer ${id}: ${score}`);
 
-        await publishMessage('complete-content-process', { influencerId });
+        await publishMessage('complete-content-process', {id});
     } catch (error) {
         console.error('Error scoring influencer:', error.message);
     }

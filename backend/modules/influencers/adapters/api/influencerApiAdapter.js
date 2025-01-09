@@ -9,7 +9,7 @@ exports.handleInfluencerRequest = async (data) => {
         const needsUpdate = await checkLastSearch(id);
 
         if (needsUpdate) {
-            await publishMessage('fetch-influencer-data', id);
+            await publishMessage('fetch-influencer-data', {id});
         }
 
         return await getInfluencerById(id);
