@@ -13,20 +13,3 @@ exports.addToQueue = async (influencerId, period) => {
         throw error;
     }
 };
-
-/**
- * Verifica si un influencer ya está en la cola.
- * @param {string} name - Nombre del influencer.
- * @returns {number|null} - Posición en la cola o `null` si no está.
- */
-exports.checkQueueForInfluencer = async (name) => {
-    try {
-        const queue = getFunctions().taskQueue('fetchDataQueueHandler');
-        const tasks = await queue.getTasks();
-        const position = tasks.findIndex((task) => task.payload.name === name);
-        return position >= 0 ? position + 1 : null;
-    } catch (error) {
-        console.error('Error checking queue for influencer:', error.message);
-        return null;
-    }
-};
