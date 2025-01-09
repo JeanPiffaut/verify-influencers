@@ -4,7 +4,7 @@ class Influencer {
         this.name = name;
         this.lastSearchDate = lastSearchDate || null; // Fecha de última actualización
         this.status = status || 'new'; // Estados posibles: new, updating, done
-        this.score = score;
+        this.score = score || null;
         this.data = data || {}; // Información adicional del influencer
     }
 

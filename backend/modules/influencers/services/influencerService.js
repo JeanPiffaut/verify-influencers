@@ -1,4 +1,6 @@
-const { getInfluencerById, saveInfluencer, updateLastSearchDate, updateScore, createInfluencer} = require('../repository/influencerRepository');
+const { getInfluencerById, saveInfluencer, updateLastSearchDate, updateScore, createInfluencer, getInfluencerByName,
+    updateInfluencerStatus
+} = require('../repository/influencerRepository');
 const Influencer = require('../domain/influencer');
 const {publishMessage} = require("../../shared/utils/pubsub");
 
@@ -28,15 +30,31 @@ exports.updateInfluencerScore = async (id, score) => {
     await updateScore(id, score);
 };
 
-exports.handleInfluencerLogic = async (id, name) => {
-    const influencer = await getInfluencerById(id);
+exports.handleInfluencerLogic = async (name) => {
+    const influencer = await getInfluencerByName(name);
+    const today = new Date();
 
     if (!influencer) {
-        // Crear nuevo perfil y publicar el evento de actualización
-        const newInfluencer = await createInfluencer(id, name);
-        await updateInfluencerStatus(id, 'updating');
-        await publishMessage('fetch-influencer-data', { influencerId: id, period: '3m' });
-        return { status: 'new', message: 'Data is being fetched.', influencer: newInfluencer };
+        // Calcular rango de fechas: últimos 3 meses
+        const startDate = new Date();
+        startDate.setMonth(today.getMonth() - 3);
+
+        const newInfluencer = await createInfluencer(name);
+        await updateInfluencerStatus(newInfluencer.id, 'updating');
+
+        await publishMessage('fetch-influencer-data', {
+            influencerId: newInfluencer.id,
+            period: {
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: today.toISOString().split('T')[0],
+            },
+        });
+
+        return {
+            status: 'new',
+            message: 'Data is being fetched.',
+            influencer: newInfluencer,
+        };
     }
 
     if (influencer.status === 'updating') {
@@ -44,9 +62,25 @@ exports.handleInfluencerLogic = async (id, name) => {
     }
 
     if (influencer.needsUpdate()) {
-        await updateInfluencerStatus(id, 'updating');
-        await publishMessage('fetch-influencer-data', { influencerId: id, period: '3m' });
-        return { status: 'in-progress', message: 'Data update started.', influencer };
+        const startDate = influencer.lastSearchDate
+            ? new Date(influencer.lastSearchDate)
+            : new Date(today.setMonth(today.getMonth() - 3));
+
+        await updateInfluencerStatus(influencer.id, 'updating');
+
+        await publishMessage('fetch-influencer-data', {
+            influencerId: influencer.id,
+            period: {
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: today.toISOString().split('T')[0],
+            },
+        });
+
+        return {
+            status: 'in-progress',
+            message: 'Data update started.',
+            influencer,
+        };
     }
 
     return { status: 'done', message: 'Data is up-to-date.', influencer };

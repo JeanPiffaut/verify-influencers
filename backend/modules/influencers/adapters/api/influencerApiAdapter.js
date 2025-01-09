@@ -3,15 +3,15 @@ const { HttpsError } = require('firebase-functions/v2/https');
 
 exports.handleInfluencerRequest = async (data) => {
     try {
-        const { id, name } = data.data.payload;
+        const { name } = data.data.payload;
 
-        if (!id || !name) {
-            throw new HttpsError('invalid-argument', 'Influencer ID and name are required.');
+        if (!name) {
+            throw new HttpsError('invalid-argument', 'Influencer name are required.');
         }
 
-        console.log(`Received request for influencer: ${name} (${id})`);
+        console.log(`Received request for influencer: ${name}`);
 
-        const result = await handleInfluencerLogic(id, name);
+        const result = await handleInfluencerLogic(name);
         return result;
     } catch (error) {
         console.error('Error handling influencer request:', error.message);
