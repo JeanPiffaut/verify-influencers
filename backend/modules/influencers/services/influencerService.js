@@ -1,27 +1,28 @@
-const { updateStatus } = require('../repository/influencerRepository');
-const { publishMessage } = require('../../shared/utils/pubsub');
+const { getInfluencerById, saveInfluencer, updateLastSearchDate, updateScore} = require('../repository/influencerRepository');
+const Influencer = require('../domain/influencer');
 
-exports.processInfluencerData = async (name) => {
-    await updateStatus(name, 'collecting');
-
-    // Simula un retraso de 2 segundos
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    await publishMessage('validate-claims', { name });
-
-    return { message: `Influencer ${name} processed successfully.` };
+exports.checkLastSearch = async (id) => {
+    const influencer = await getInfluencerById(id);
+    if (!influencer) {
+        return null; // No existe
+    }
+    return influencer.needsUpdate(); // Verifica si necesita actualización
 };
 
-exports.validateInfluencerClaims = async (name) => {
-    await updateStatus(name, 'validating');
+exports.fetchInfluencerData = async (id) => {
+    // Aquí se simula una llamada a una API externa para obtener datos del influencer
+    const dataFromAPI = {
+        id,
+        name: 'John Doe',
+        data: { followers: 10000, tweets: 500 },
+    };
+    const influencer = new Influencer(dataFromAPI.id, dataFromAPI.name, new Date().toISOString().split('T')[0], null, dataFromAPI.data);
 
-    // Simula un retraso de 2 segundos
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await saveInfluencer(influencer);
+    return influencer;
+};
 
-    await updateStatus(name, 'scoring');
-
-    // Simula un retraso de 2 segundos
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    await updateStatus(name, 'completed');
+exports.updateInfluencerScore = async (id, score) => {
+    await updateLastSearchDate(id);
+    await updateScore(id, score);
 };
