@@ -21,7 +21,7 @@ exports.fetchInfluencerData = async (influencerId, period) => {
     }
 
     // Obtener contenido desde la API de Twitter
-    const tweets = await getTweets(influencer.name, period.startDate, period.endDate);
+    const tweets = await getTweets(influencer.twitterId, period.startDate, period.endDate);
 
     // Guardar cada tweet como contenido
     for (const tweet of tweets) {

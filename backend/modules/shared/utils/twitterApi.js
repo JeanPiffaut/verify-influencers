@@ -3,28 +3,24 @@ const Content = require("../../content/domain/content");
 
 /**
  * Obtiene los tweets de un usuario en un rango de fechas.
- * @param {string} username - Nombre de usuario de Twitter (sin @).
+ * @param userId
  * @param {string} startDate - Fecha de inicio en formato 'YYYY-MM-DD'.
  * @param {string} endDate - Fecha de fin en formato 'YYYY-MM-DD'.
  * @returns {Promise<Array>} - Lista de tweets.
  */
-exports.getTweets = async (username, startDate, endDate) => {
+exports.getTweets = async (userId, startDate, endDate) => {
     try {
-        // Obtiene la información del usuario para acceder a su ID
-        const user = await twitterClient.v2.userByUsername(username);
-        const userId = user.data.id;
-
         // Parámetros para la búsqueda de tweets
         const params = {
             max_results: 100,
-            'tweet.fields': 'created_at,public_metrics',
-            'start_time': new Date(startDate).toISOString(),
-            'end_time': new Date(endDate).toISOString(),
+            //'tweet.fields': 'created_at,public_metrics',
+            //'start_time': new Date(startDate).toISOString(),
+            //'end_time': new Date(endDate).toISOString(),
         };
 
         // Realiza la solicitud para obtener los tweets del usuario
         const response = await twitterClient.v2.userTimeline(userId, params);
-
+        console.log(response);
         // Verifica si la propiedad 'data' existe y es un arreglo
         if (Array.isArray(response.data)) {
             // Mapear los tweets a instancias del modelo Content
