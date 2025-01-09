@@ -1,8 +1,9 @@
-const { getInfluencerById, saveInfluencer, updateLastSearchDate, updateScore, createInfluencer, getInfluencerByName,
+const { getInfluencerById, updateLastSearchDate, updateScore, createInfluencer, getInfluencerByName,
     updateInfluencerStatus
 } = require('../repository/influencerRepository');
-const Influencer = require('../domain/influencer');
 const {publishMessage} = require("../../shared/utils/pubsub");
+const {saveContent} = require("../../content/repository/contentRepository");
+const {getTweets} = require("../../shared/utils/twitterApi");
 
 exports.checkLastSearch = async (id) => {
     const influencer = await getInfluencerById(id);
@@ -12,17 +13,27 @@ exports.checkLastSearch = async (id) => {
     return influencer.needsUpdate(); // Verifica si necesita actualización
 };
 
-exports.fetchInfluencerData = async (id) => {
-    // Aquí se simula una llamada a una API externa para obtener datos del influencer
-    const dataFromAPI = {
-        id: id,
-        name: 'John Doe',
-        data: { followers: 10000, tweets: 500 },
-    };
-    const influencer = new Influencer(dataFromAPI.id, dataFromAPI.name, new Date(), null, dataFromAPI.data);
+exports.fetchInfluencerData = async (influencerId, period) => {
+    // Obtener datos del influencer desde Firestore
+    const influencer = await getInfluencerById(influencerId);
+    if (!influencer) {
+        throw new Error(`Influencer with ID ${influencerId} not found.`);
+    }
 
-    await saveInfluencer(influencer);
-    return influencer;
+    // Obtener contenido desde la API de Twitter
+    const tweets = await getTweets(influencer.name, period.startDate, period.endDate);
+
+    // Guardar cada tweet como contenido
+    for (const tweet of tweets) {
+        await saveContent({
+            influencerId,
+            text: tweet.text,
+            createdAt: tweet.created_at,
+            metadata: { retweets: tweet.retweets, likes: tweet.likes },
+        });
+    }
+
+    return { influencer, tweets };
 };
 
 exports.updateInfluencerScore = async (id, score) => {

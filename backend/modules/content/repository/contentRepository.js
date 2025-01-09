@@ -13,13 +13,11 @@ exports.getContentByInfluencerId = async (influencerId) => {
 
 exports.saveContent = async (content) => {
     const docRef = db.collection('content').doc();
-    content.id = docRef.id; // Asigna un ID único
     await docRef.set({
         influencerId: content.influencerId,
-        type: content.type,
         text: content.text,
-        metadata: content.metadata,
         createdAt: content.createdAt,
+        metadata: content.metadata,
     });
 };
 
