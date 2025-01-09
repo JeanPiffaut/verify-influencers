@@ -37,8 +37,8 @@ const CallApiForm: React.FC = () => {
         setResponse("");
 
         try {
-            const apiFunction = httpsCallable<{ action: string; payload: { id: string } }, { message: string }>(functions, "api");
-            const result = await apiFunction({ action: "start", payload: { id: input } });
+            const apiFunction = httpsCallable<{ action: string; payload: { name: string } }, { message: string }>(functions, "api");
+            const result = await apiFunction({ action: "start", payload: { name: input } });
             setResponse(result.data.message);
         } catch (err: any) {
             setError(`Error: ${err.message}`);

@@ -29,7 +29,10 @@ exports.fetchInfluencerData = async (influencerId, period) => {
             influencerId,
             text: tweet.text,
             createdAt: tweet.created_at,
-            metadata: { retweets: tweet.retweets, likes: tweet.likes },
+            metadata: {
+                retweets: tweet.public_metrics.retweet_count,
+                likes: tweet.public_metrics.like_count,
+            },
         });
     }
 
