@@ -22,7 +22,7 @@ exports.saveInfluencer = async (influencer) => {
 };
 
 exports.updateLastSearchDate = async (id) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
     await db.collection('influencers').doc(id).update({ lastSearchDate: today });
 };
 

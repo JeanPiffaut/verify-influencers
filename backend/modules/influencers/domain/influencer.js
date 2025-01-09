@@ -7,13 +7,11 @@ class Influencer {
         this.data = data; // Datos adicionales sobre el influencer
     }
 
-    // Método para verificar si los datos están desactualizados
     needsUpdate() {
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date();
         return this.lastSearchDate !== today;
     }
 
-    // Método para actualizar el puntaje
     updateScore(newScore) {
         this.score = newScore;
     }

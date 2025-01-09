@@ -16,7 +16,7 @@ exports.fetchInfluencerData = async (id) => {
         name: 'John Doe',
         data: { followers: 10000, tweets: 500 },
     };
-    const influencer = new Influencer(dataFromAPI.id, dataFromAPI.name, new Date().toISOString().split('T')[0], null, dataFromAPI.data);
+    const influencer = new Influencer(dataFromAPI.id, dataFromAPI.name, new Date(), null, dataFromAPI.data);
 
     await saveInfluencer(influencer);
     return influencer;
