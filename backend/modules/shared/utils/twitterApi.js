@@ -14,8 +14,8 @@ exports.getTweets = async (userId, startDate, endDate) => {
         const params = {
             max_results: 100,
             //'tweet.fields': 'created_at,public_metrics',
-            //'start_time': new Date(startDate).toISOString(),
-            //'end_time': new Date(endDate).toISOString(),
+            'start_time': new Date(startDate).toISOString(),
+            'end_time': new Date(endDate).toISOString(),
         };
 
         // Realiza la solicitud para obtener los tweets del usuario
@@ -47,7 +47,7 @@ exports.getTweets = async (userId, startDate, endDate) => {
             const timeToWait = resetTimeout - Date.now();
             console.warn(`Rate limit reached. Retrying after ${Math.ceil(timeToWait / 1000)} seconds...`);
         }
-        //console.error('Error fetching tweets:', error);
+        console.error('Error fetching tweets:', error);
         throw new Error('Failed to fetch tweets from Twitter API.');
     }
 };

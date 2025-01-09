@@ -5,7 +5,7 @@ const { getFunctions } = require('firebase-admin/functions');
  */
 exports.addToQueue = async (influencerId, period) => {
     try {
-        const queue = getFunctions().taskQueue('queue/fetchDataQueueHandler');
+        const queue = getFunctions().taskQueue('fetchDataQueueHandler');
         await queue.enqueue({ influencerId, period });
         console.log(`Task added to queue for influencer ${influencerId}`);
     } catch (error) {
@@ -21,7 +21,7 @@ exports.addToQueue = async (influencerId, period) => {
  */
 exports.checkQueueForInfluencer = async (name) => {
     try {
-        const queue = getFunctions().taskQueue('queue/fetchDataQueueHandler');
+        const queue = getFunctions().taskQueue('fetchDataQueueHandler');
         const tasks = await queue.getTasks();
         const position = tasks.findIndex((task) => task.payload.name === name);
         return position >= 0 ? position + 1 : null;

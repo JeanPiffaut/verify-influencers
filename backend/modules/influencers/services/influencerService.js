@@ -1,9 +1,9 @@
 const { getInfluencerById, updateLastSearchDate, updateScore, createInfluencer, getInfluencerByName,
     updateInfluencerStatus
 } = require('../repository/influencerRepository');
-const {publishMessage} = require("../../shared/utils/pubsub");
 const {saveContent} = require("../../content/repository/contentRepository");
 const {getTweets} = require("../../shared/utils/twitterApi");
+const {addToQueue} = require("./queueService");
 
 exports.checkLastSearch = async (id) => {
     const influencer = await getInfluencerById(id);
@@ -21,7 +21,7 @@ exports.fetchInfluencerData = async (influencerId, period) => {
     }
 
     // Obtener contenido desde la API de Twitter
-    const tweets = await getTweets(influencer.twitterId, period.startDate, period.endDate);
+    const tweets = await getTweets(influencer.name, period.startDate, period.endDate);
 
     // Guardar cada tweet como contenido
     for (const tweet of tweets) {
@@ -55,17 +55,13 @@ exports.handleInfluencerLogic = async (name) => {
 
         const newInfluencer = await createInfluencer(name);
         await updateInfluencerStatus(newInfluencer.id, 'updating');
-
-        await publishMessage('fetch-influencer-data', {
-            influencerId: newInfluencer.id,
-            period: {
-                startDate: startDate.toISOString().split('T')[0],
-                endDate: today.toISOString().split('T')[0],
-            },
+        await addToQueue(newInfluencer.id, {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: today.toISOString().split('T')[0],
         });
 
         return {
-            status: 'new',
+            status: 'queue',
             message: 'Data is being fetched.',
             influencer: newInfluencer,
         };
@@ -80,14 +76,11 @@ exports.handleInfluencerLogic = async (name) => {
             ? new Date(influencer.lastSearchDate)
             : new Date(today.setMonth(today.getMonth() - 3));
 
-        await updateInfluencerStatus(influencer.id, 'updating');
+        await updateInfluencerStatus(influencer.id, 'queue');
 
-        await publishMessage('fetch-influencer-data', {
-            influencerId: influencer.id,
-            period: {
-                startDate: startDate.toISOString().split('T')[0],
-                endDate: today.toISOString().split('T')[0],
-            },
+        await addToQueue(influencer.id, {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: today.toISOString().split('T')[0],
         });
 
         return {
